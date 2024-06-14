@@ -134,8 +134,8 @@ class Dice:
 
         return tuple([res, raw_roll, roll_str])
 
-d20 = Dice(20)
-print(d20)
-print(d20.roll(modifier=-1, advantage=True))
-print(d20.roll(num_dice=4, sides=6, modifier=5, reroll=(2, 'le')))
-print(d20.roll(num_dice=10, sides=10, success_on=8, explode_on=10))
+# d20 = Dice(20)
+# print(d20)
+# print(d20.roll(modifier=-1, advantage=True))
+# print(d20.roll(num_dice=4, sides=6, modifier=5, reroll=(2, 'le')))
+# print(d20.roll(num_dice=10, sides=10, success_on=8, explode_on=10))

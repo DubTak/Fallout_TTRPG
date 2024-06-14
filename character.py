@@ -29,6 +29,7 @@ class Skill:
 class Character:
     def __init__(self):
         # General Info
+        self.new_character = True
         self.player = None
         self.name = None
         self.race = None
@@ -74,6 +75,7 @@ class Character:
         self.speech = Skill('Speech', self.C)
         self.unarmed = Skill('Unarmed', [self.S, self.A])
         self.skills_per_level_bonus = 0
+        self.skills_per_level_misc_bonus = 0
         self.unspent_skills = 0
         self.skills = [
             self.barter, self.breach, self.crafting, self.energy_weapons,
@@ -142,6 +144,13 @@ class Character:
         self.calc_luck_bonus()
         for skill in self.skills:
             self.calc_skill_total(skill)
+        if self.I.modifier > 0:
+            self.skills_per_level_bonus = 1 + self.skills_per_level_misc_bonus
+        elif self.I.modifier < 0:
+            self.skills_per_level_bonus = -1 + self.skills_per_level_misc_bonus
+        else:
+            self.skills_per_level_bonus = 0 + self.skills_per_level_misc_bonus
+
         self.sp_max = self.A.modifier + 10 + (5 + self.A.modifier) * ((self.level - 1) // 2)
         self.hp_max = (self.E.modifier + 10 + (5 + self.E.modifier) * ((self.level - 1) // 2)) - self.rad_damage
         self.ap_max = self.A.modifier + 10
@@ -153,11 +162,7 @@ class Character:
         self.death_save_mod = max([self.E.modifier, self.L.modifier]) + self.party_nerve
         self.targeted_attack_rerolls = max([self.L.modifier, 0])
 
-    def adjust_attribute(self, attribute, change, temporary=False):
-        # if change > 0 and change > self.unspent_perks:
-        #     return
-        # if attribute.score + change >= 10 and not temporary:
-        #     return
+    def adjust_attribute(self, attribute, change):
         attribute.score += change
         if self.L.score >= 10 and not self.luck_10_karma:
             self.karma_caps += 1
