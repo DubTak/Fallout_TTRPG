@@ -231,7 +231,7 @@ buzz_saw.damage_dice = '1d8'
 buzz_saw.damage_type = 'slashing'
 buzz_saw.crit.update({'Multiplier': 2, 'Effect': 'applies bleeding'})
 buzz_saw.properties = ['Cleave', 'Durable']
-handy.extra_traits['Buzz Saw'] = 'self.inventory.update({"Buzz Saw (attached)": [1, buzz_saw]})'
+handy.extra_traits['Buzz Saw'] = 'self.add_to_inventory("Buzz Saw (attached)", buzz_saw)'
 
 clippers = BladedWeapon('Clippers')
 clippers.description = "A large, sharp set of clippers for wiring, gardening, or opening boxes."
@@ -240,35 +240,23 @@ clippers.damage_dice = '1d4'
 clippers.damage_type = 'piercing'
 clippers.crit.update({'Target Num': 19, 'Bonus_Damage': '1d4'})
 clippers.properties = ['Dismember', 'Durable']
-handy.extra_traits['Clippers'] = 'self.inventory.update({"Clippers (attached)": [1, clippers]})'
+handy.extra_traits['Clippers'] = 'self.add_to_inventory("Clippers (attached)", clippers)'
 
-clippers = BladedWeapon('Clippers')
-clippers.description = "A large, sharp set of clippers for wiring, gardening, or opening boxes."
-clippers.ap_cost = 3
-clippers.damage_dice = '1d4'
-clippers.damage_type = 'piercing'
-clippers.crit.update({'Target Num': 19, 'Bonus_Damage': '1d4'})
-clippers.properties = ['Dismember', 'Durable']
-handy.extra_traits['Clippers'] = [
-    'self.inventory.update({"Clippers (attached)": [1, clippers]})',
-    clippers,
-]
-
-robo_drill = BladedWeapon('Drill')
+robo_drill = MechanicalWeapon('Drill')
 robo_drill.description = "This drill has interchanging bits used for screws, nuts, bolts, and pilot holes"
 robo_drill.ap_cost = 6
 robo_drill.damage_dice = '1d8'
 robo_drill.damage_type = 'slashing'
 robo_drill.crit.update({'Bonus_Damage': '2d8'})
 robo_drill.properties = ['Durable', 'Mangle']
-handy.extra_traits['Clippers'] = 'self.inventory.update({"Drill (attached)": [1, robo_drill]})'
+handy.extra_traits['Drill'] = 'self.add_to_inventory("Drill (attached)", robo_drill)'
 
 gripper = Gear('Gripper')
 gripper.description = ("The Gripper is two finger-like appendages that can grab, twist, operate, use weapons, "
                        "and hold items. Operating at similar efficiency to a human hand. "
                        "If you do not have at least two of these tools, you effectively only have one hand. (This"
                        "affects some weapons which have the two handed, unwieldy, or kickback special properties.")
-handy.extra_traits['Gripper'] = 'self.inventory.update({"Gripper (attached)": [1, gripper]})'
+handy.extra_traits['Gripper'] = 'self.add_to_inventory("Gripper (attached)", gripper)'
 
 robo_torch = RangedWeapon('Mr. Handy Torch')
 robo_torch.description = ("This kitchen tool emits a flame with an adjustable nozzle for cooking, flambéing, "
@@ -279,7 +267,7 @@ robo_torch.damage_type = 'fire'
 robo_torch.range = '10 ft. line'
 robo_torch.properties = ['Area of Effect', 'Durable', 'Incendiary']
 robo_torch.ammo.update({'Type': 'fuel', 'Mag Size': 5, 'Current Mag': 5})
-handy.extra_traits['Mr. Handy Torch'] = 'self.inventory.update({"Mr. Handy Torch (attached)": [1, robo_torch]})'
+handy.extra_traits['Mr. Handy Torch'] = 'self.add_to_inventory("Mr. Handy Torch (attached)", robo_torch)'
 
 
 # Super Mutants

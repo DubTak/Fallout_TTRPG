@@ -8,8 +8,9 @@ class Item:
         self.properties = None
         self.description = None
 
+    # I should probably make this the __str__() and make __repr__() more descriptive, but that's a tomorrow problem
     def __repr__(self):
-        return f'{self.name}'
+        return f'{self.__class__.__name__}(\'{self.name}\')'
 
 
 class Armor(Item):
@@ -24,7 +25,7 @@ class Armor(Item):
         self.is_equipped = False
 
     def __repr__(self):
-        return f'{self.name} {self.type}'
+        return super().__repr__()
 
 
 class Weapon(Item):
@@ -46,6 +47,9 @@ class Weapon(Item):
         self.decay = 0
         self.is_equipped = False
 
+    def __repr__(self):
+        return super().__repr__()
+
 
 class MeleeWeapon(Weapon):
     def __init__(self, name):
@@ -55,7 +59,7 @@ class MeleeWeapon(Weapon):
         self.slots = 1
 
     def __repr__(self):
-        return f'{self.name} ({self.subtype})'
+        return super().__repr__()
 
 
 class BladedWeapon(MeleeWeapon):
@@ -63,11 +67,17 @@ class BladedWeapon(MeleeWeapon):
         super().__init__(name)
         self.subtype = 'Bladed Weapon'
 
+    def __repr__(self):
+        return super().__repr__()
+
 
 class BluntWeapon(MeleeWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Blunt Weapon'
+
+    def __repr__(self):
+        return super().__repr__()
 
 
 class MechanicalWeapon(MeleeWeapon):
@@ -75,12 +85,18 @@ class MechanicalWeapon(MeleeWeapon):
         super().__init__(name)
         self.subtype = 'Mechanical Weapon'
 
+    def __repr__(self):
+        return super().__repr__()
+
 
 class UnarmedWeapon(MeleeWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Unarmed'
         self.main_attribute = ['Strength', 'Agility']
+
+    def __repr__(self):
+        return super().__repr__()
 
 
 class RangedWeapon(Weapon):
@@ -90,10 +106,17 @@ class RangedWeapon(Weapon):
         self.main_attribute = 'Agility'
         self.ammo = {'Type': None, 'Mag Size': None, 'Current Mag': None, 'Times Reloaded': None}
 
+    def __repr__(self):
+        return super().__repr__()
+
+
 class Handgun(RangedWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Handgun'
+
+    def __repr__(self):
+        return super().__repr__()
 
 
 class SubmachineGun(RangedWeapon):
@@ -101,11 +124,17 @@ class SubmachineGun(RangedWeapon):
         super().__init__(name)
         self.subtype = 'Submachine Gun'
 
+    def __repr__(self):
+        return super().__repr__()
+
 
 class Rifle(RangedWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Rifle'
+
+    def __repr__(self):
+        return super().__repr__()
 
 
 class Shotgun(RangedWeapon):
@@ -113,11 +142,17 @@ class Shotgun(RangedWeapon):
         super().__init__(name)
         self.subtype = 'Shotgun'
 
+    def __repr__(self):
+        return super().__repr__()
+
 
 class BigGun(RangedWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Big Gun'
+
+    def __repr__(self):
+        return super().__repr__()
 
 
 class EnergyWeapon(RangedWeapon):
@@ -126,8 +161,14 @@ class EnergyWeapon(RangedWeapon):
         self.subtype = 'Energy Weapon'
         self.main_attribute = 'Perception'
 
+    def __repr__(self):
+        return super().__repr__()
+
 
 class Gear(Item):
     def __init__(self, name):
         super().__init__(name)
         self.type = 'Gear'
+
+    def __repr__(self):
+        return super().__repr__()

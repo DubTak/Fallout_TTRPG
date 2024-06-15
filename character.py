@@ -6,7 +6,8 @@ from race import (
     robot, handy,  # protectron, robobrain
     buzz_saw, clippers, robo_drill, gripper, robo_torch
     # add robots and super mutants once implemented
-)
+)  # make a main.py and move this over to it
+import random
 
 
 
@@ -209,9 +210,16 @@ class Character:
             else:
                 if v[0] != 'UNIMPLEMENTED':
                     exec(v[0])
+        if race.extra_traits != {}:
+            key_list = [key for key in race.extra_traits.keys()]
+            choice = random.choice(key_list)  # VERY TEMPORARY FIX: IMPLEMENT CHOOSING ASAP
+            exec(race.extra_traits[choice])
+
         self.recalculate()
         # figure out a way to remove race
 
-
-
-
+    def add_to_inventory(self, item_name, item):
+        if item_name in self.inventory:
+            self.inventory[item_name][0] += 1
+        else:
+            self.inventory[item_name] = [1, item]
