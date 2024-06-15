@@ -5,9 +5,10 @@ from collections import Counter
 class Dice:
     def __init__(self, sides):
         self.sides = sides
+        self.name = f'd{self.sides}'
 
     def __repr__(self):
-        return f'd{self.sides}'
+        return f'{self.name}'
 
     def roll(self, num_dice=1, sides=None, modifier=0, **kwargs):
         if sides is None:
@@ -134,8 +135,31 @@ class Dice:
 
         return tuple([res, raw_roll, roll_str])
 
+    def roll_from_string(self, string):
+        # basic regex string is '(\d*)d(\d+)[+\-]?(\d*)' but I don't know how to do the extra bits yet
+        matches = re.findall('(\d*)d(\d+)[+\-]?(\d*)', string)
+        int_list = []
+        if matches != []:
+            if matches[0][0] == '':
+                int_list.append(1)
+            for match in matches[0]:
+                if match != '':
+                    int_list.append(int(match))
+
+        num_dice = int_list[0]
+        sides = int_list[1]
+        modifier = 0
+        if len(int_list) == 3:
+            modifier = int_list[2]
+
+        return self.roll(num_dice, sides, modifier)
+
 # d20 = Dice(20)
 # print(d20)
 # print(d20.roll(modifier=-1, advantage=True))
 # print(d20.roll(num_dice=4, sides=6, modifier=5, reroll=(2, 'le')))
 # print(d20.roll(num_dice=10, sides=10, success_on=8, explode_on=10))
+
+# d20 = Dice(20)
+# d20_roll = d20.roll_from_string(d20.name)
+# print(d20_roll)

@@ -2,9 +2,12 @@ from race import (
     # Race,
     human, human_var1, human_var2, human_var1_and_var2,
     ghoul, ghoul_var1,
-    synth, synth_var1
+    synth, synth_var1,
+    robot, handy,  # protectron, robobrain
+    buzz_saw, clippers, robo_drill, gripper, robo_torch
     # add robots and super mutants once implemented
 )
+
 
 
 class Attribute:

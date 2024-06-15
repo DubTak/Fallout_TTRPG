@@ -1,17 +1,20 @@
 from copy import deepcopy
+from item import Gear, BladedWeapon, MechanicalWeapon, RangedWeapon
 
 class Race:
-    def __init__(self, name, type, variant1=False, variant2=False):
+    def __init__(self, name, type, variant1=False, variant2=False, variant3=False):
         self.name = name
         self.type = type
         self.traits = {'Age': '', 'Size': []}
+        self.extra_traits = {}
         self.variant1 = variant1
-        self.variant1_traits = None
         self.variant2 = variant2
-        self.variant2_traits = None
+        self.variant3 = variant3
         self.extra_description = None
 
     def __repr__(self):
+        if self.type == 'Robot':
+            return f'{self.name} {self.type}'
         return f'{self.name}'
 
 
@@ -19,7 +22,10 @@ class Race:
 human = Race('Human', 'Human')
 human.traits['Age'] = ("Humans reach adulthood in their late teens and live less than a century. "
                        "Though, those who live this long are far and few between in the wasteland.")
-human.traits['Size'] = ['Medium', 'Small']
+human.traits['Size'] = [
+    ['Medium', 'Small'],
+    "Humans vary widely in height and build. Your size is Medium or Small.",
+]
 
 human_var1 = deepcopy(human)
 human_var1.name = 'Human (Variant)'
@@ -54,7 +60,10 @@ human_var1_and_var2.extra_description = human_var2_desc
 ghoul = Race('Ghoul', 'Ghoul')
 ghoul.traits['Age'] = ("Ghouls are nearly immortal, their lifespan is unknown. "
                        "Some Ghouls have survived from even before the Great War over 200 years ago.")
-ghoul.traits['Size'] = ['Medium', 'Small']
+ghoul.traits['Size'] = [
+    ['Medium', 'Small'],
+    "Ghouls vary widely in height and build. Your size is Medium or Small.",
+]
 evolution_exec = '''
 setattr(self, 'rad_level', None), setattr(self, 'irradiated_food', None)
 setattr(self, 'radiation_dc', None), self.immunities.add("radiation") 
@@ -97,30 +106,35 @@ ghoul_var1.traits['Half Life'] = [
     "own, and your character is controlled by the GM."
 ]
 
-
-# Gen-2 Synth
-synth = Race('Gen-2 Synth', 'Synth')
-synth.traits['Age'] = ("Gen-2 Synths can live hundreds of years before their inorganic materials begin to "
-                       "corrode and their programming deteriorates. However, a Synth who keeps consistent "
-                       "repairs is nigh immortal.")
-synth.traits['Size'] = ['Medium', 'Small']
-inorganic_body_exec = """
+# Trait shared by synths and robots
+inorganic_body_exec = '''
 self.immunities.update(["poison", "radiation"])
 self.condition_immunities.add("suffocating")
 self.rad_level, self.irradiated_food, self.hunger, self.thirst, self.radiation_dc = None, None, None, None, None
-"""
-synth.traits['Inorganic Body'] = [
-    inorganic_body_exec,
-    "You are immune to radiation and poison. You gain no effects from Chems, Drinks or Food. "
-    "Additionally you have no need to breathe, sleep, eat, or drink.",
-    # 'UNIMPLEMENTED'  # I need to add food/drink/etc effects and then add ability to reduce those effects
-]
+'''
+inorganic_body_desc = ("You are immune to radiation and poison. You gain no effects from Chems, Drinks or Food. "
+                       "Additionally you have no need to breathe, sleep, eat, or drink.")
 synth_and_robot_rest = """
 - You do not require sleep.
 - 1 hour of rest restores your stamina points to full.
 - 2 hours of rest restores a number of hit points equal to half your INT or PER score + your level 
   and removes one level of exhaustion.
 """
+
+# Gen-2 Synth
+synth = Race('Gen-2 Synth', 'Synth')
+synth.traits['Age'] = ("Gen-2 Synths can live hundreds of years before their inorganic materials begin to "
+                       "corrode and their programming deteriorates. However, a Synth who keeps consistent "
+                       "repairs is nigh immortal.")
+synth.traits['Size'] = [
+    ['Medium', 'Small'],
+    "Gen-2 Synths vary widely in height and build. Your size is Medium or Small.",
+]
+synth.traits['Inorganic Body'] = [
+    inorganic_body_exec,
+    inorganic_body_desc,
+    # 'UNIMPLEMENTED'  # I need to add food/drink/etc effects and then add ability to reduce those effects
+]
 synth.extra_description = synth_and_robot_rest
 
 synth_var1 = deepcopy(synth)
@@ -143,7 +157,129 @@ synth_var1.traits['Artificial Intelligence Algorithms'] = [
 
 
 # Robots
+robot = Race('Robot', 'Robot')
+robot.traits['Age'] = ("Robots can live hundreds of years before their inorganic materials begin to corrode and "
+                       "their programming deteriorates. However, a Robot who keeps consistent repairs "
+                       "is nigh immortal.")
+robot.traits['Size'] = [
+    'Medium',
+    "While there are many types of Robots, most were built to maintain a similar size to humans. "
+    "Handy’s are about 2 and a half feet to 3 and a half feet in height but hover 2 to 3 feet off the ground. "
+    "Protectrons rarely were built taller than 5 feet. And Robobrains typically sit around 5 and a half feet. "
+    "Regardless, your size is medium.",
+]
+robot.traits['Inorganic Body'] = [
+    inorganic_body_exec,
+    inorganic_body_desc,
+    # 'UNIMPLEMENTED'  # I need to add food/drink/etc effects and then add ability to reduce those effects
+]
+robot.traits['Severed Limbs'] = [
+    'UNIMPLEMENTED',  # there is very little chance of automating this, so we'll just have the text desc somewhere
+    "Luckily for most robots, reattaching limbs is commonplace when they break or fall off. "
+    "If any of your limbs are severed, you do not go into shock and they can be reattached with 3 steel "
+    "and 1 circuitry junk item. When you or a creature reattaches a limb, it takes a number of minutes equal "
+    "to 10 - their or your crafting skill bonus. If the amount of time is reduced to 0, "
+    "it takes 6 AP to reattach the limb instead.",
+]
+robot.traits['Armor and Weapons'] = [
+    'UNIMPLEMENTED',  # ditto from Severed Limbs, unless I can flag 'no power armor'?
+    "You can use armor and weapons just as any other race would. If your robot sub-type grants you a weapon, "
+    "you can upgrade and modify this weapon just like any other weapon. However, you cannot use power armor.",
+]
 
+handy = deepcopy(robot)
+handy.name = 'Handy'
+handy.variant1 = True
+handy.traits['Limbs and Targeted Attacks'] = [
+    'UNIMPLEMENTED', # need to implement limb damage, and even then this will be mostly desc
+    "Handys have a less human shape to them than other robots, floating off the ground with three appendages "
+    "and three eyes attached to a large round core. You have three arms, three eyes, and can have up to three "
+    "hands if you choose to have three Grippers in the Incredible Multi-Talented Appliance section below. "
+    "You do not have a head, groin, or legs that can be targeted by targeted attacks or severed. "
+    "Instead; targeted attacks to your eyes cost 2 less AP and creatures can target your jet engine. "
+    "The jet engine functions exactly the same as a targeted attack to the legs, except the attack costs 2 more AP. "
+    "If your jet engine is severed, you fall prone and cannot move until it is reattached.",
+]
+handy.traits['Fuel'] = [
+    'UNIMPLEMENTED',  # this feels like another desc only trait
+    "You require fuel to continue to operate. Every week, 7 days, or 168 hours; you can spend 6 AP to fill "
+    "your tank with a gallon of fuel or six oil junk items which are consumed upon use. "
+    "If you fail to consume a gallon of fuel after the week, you must succeed a DC 12 Endurance check for each "
+    "hour past 168. For each successful check, the DC increases by 2. On a fail, you become unconscious until "
+    "another creature fills your tank with fuel. Alternatively, you can load a fusion core into your chassis. "
+    "If you do, you can operate for 30 days without requiring fuel."
+]
+handy.traits['Jet Engine'] = [
+    'UNIMPLEMENTED',  # are robots gonna be mostly desc only? maybe...
+    "You hover a few feet off the ground while active and moving. You don't trigger any floor based traps or "
+    "activated effects. However, if you are knocked prone, become stunned, or fall unconscious; "
+    "you fall to the ground."
+]
+handy.traits['Incredible Multi-Talented Appliance!'] = [
+    'UNIMPLEMENTED',  # need to implement a choosing function for the multi-talents
+    "Handy’s are built with three special tools that are attached and built into three of their arms. "
+    "These tools and weapons can be modified like any other weapon, only require one hand to use, "
+    "and do not cost AP to equip or stow. Additionally, they cannot be detached from you unless the arm that "
+    "the tool or weapon is attached to is severed. "
+    "Choose one tool or weapon from the following list that is attached to your arm."
+]
+
+buzz_saw = BladedWeapon('Buzz Saw')
+buzz_saw.description = "A mechanical saw housed in a metal frame used to cut wood, food, bodies, or debris."
+buzz_saw.ap_cost = 5
+buzz_saw.damage_dice = '1d8'
+buzz_saw.damage_type = 'slashing'
+buzz_saw.crit.update({'Multiplier': 2, 'Effect': 'applies bleeding'})
+buzz_saw.properties = ['Cleave', 'Durable']
+handy.extra_traits['Buzz Saw'] = 'self.inventory.update({"Buzz Saw (attached)": [1, buzz_saw]})'
+
+clippers = BladedWeapon('Clippers')
+clippers.description = "A large, sharp set of clippers for wiring, gardening, or opening boxes."
+clippers.ap_cost = 3
+clippers.damage_dice = '1d4'
+clippers.damage_type = 'piercing'
+clippers.crit.update({'Target Num': 19, 'Bonus_Damage': '1d4'})
+clippers.properties = ['Dismember', 'Durable']
+handy.extra_traits['Clippers'] = 'self.inventory.update({"Clippers (attached)": [1, clippers]})'
+
+clippers = BladedWeapon('Clippers')
+clippers.description = "A large, sharp set of clippers for wiring, gardening, or opening boxes."
+clippers.ap_cost = 3
+clippers.damage_dice = '1d4'
+clippers.damage_type = 'piercing'
+clippers.crit.update({'Target Num': 19, 'Bonus_Damage': '1d4'})
+clippers.properties = ['Dismember', 'Durable']
+handy.extra_traits['Clippers'] = [
+    'self.inventory.update({"Clippers (attached)": [1, clippers]})',
+    clippers,
+]
+
+robo_drill = BladedWeapon('Drill')
+robo_drill.description = "This drill has interchanging bits used for screws, nuts, bolts, and pilot holes"
+robo_drill.ap_cost = 6
+robo_drill.damage_dice = '1d8'
+robo_drill.damage_type = 'slashing'
+robo_drill.crit.update({'Bonus_Damage': '2d8'})
+robo_drill.properties = ['Durable', 'Mangle']
+handy.extra_traits['Clippers'] = 'self.inventory.update({"Drill (attached)": [1, robo_drill]})'
+
+gripper = Gear('Gripper')
+gripper.description = ("The Gripper is two finger-like appendages that can grab, twist, operate, use weapons, "
+                       "and hold items. Operating at similar efficiency to a human hand. "
+                       "If you do not have at least two of these tools, you effectively only have one hand. (This"
+                       "affects some weapons which have the two handed, unwieldy, or kickback special properties.")
+handy.extra_traits['Gripper'] = 'self.inventory.update({"Gripper (attached)": [1, gripper]})'
+
+robo_torch = RangedWeapon('Mr. Handy Torch')
+robo_torch.description = ("This kitchen tool emits a flame with an adjustable nozzle for cooking, flambéing, "
+                          "taking care of pesky bug nests, or lighting candles.")
+robo_torch.ap_cost = 5
+robo_torch.damage_dice = '1d10'
+robo_torch.damage_type = 'fire'
+robo_torch.range = '10 ft. line'
+robo_torch.properties = ['Area of Effect', 'Durable', 'Incendiary']
+robo_torch.ammo.update({'Type': 'fuel', 'Mag Size': 5, 'Current Mag': 5})
+handy.extra_traits['Mr. Handy Torch'] = 'self.inventory.update({"Mr. Handy Torch (attached)": [1, robo_torch]})'
 
 
 # Super Mutants
