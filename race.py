@@ -1,5 +1,5 @@
 from copy import deepcopy
-from item import Gear, BladedWeapon, MechanicalWeapon, RangedWeapon
+from item_OLD import Gear, BladedWeapon, MechanicalWeapon, RangedWeapon
 
 class Race:
     def __init__(self, name, type, variant1=False, variant2=False, variant3=False):

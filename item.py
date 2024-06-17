@@ -1,174 +1,38 @@
-class Item:
-    def __init__(self, name):
-        self.name = name
-        self.id =0
-        self.load = 0
-        self.base_cost = 0
-        self.type = None
-        self.properties = None
-        self.description = None
-
-    # I should probably make this the __str__() and make __repr__() more descriptive, but that's a tomorrow problem
-    def __repr__(self):
-        return f'{self.__class__.__name__}(\'{self.name}\')'
+import pandas as pd
+import re
 
 
-class Armor(Item):
-    def __init__(self, name):
-        super().__init__(name)
-        self.type = "Armor"
-        self.ac = 10
-        self.dt = 0
-        self.slots = 0
-        self.str_req = 0
-        self.decay = 0
-        self.is_equipped = False
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class Weapon(Item):
-    def __init__(self, name):
-        # , name, id=0, type=None, subtype=None, load=0, base_cost=0, ap_cost=0, damage_dice='', damage_type='',
-        #             damage_dice2=None, damage_type2=None, slots=0, str_req=0
-        super().__init__(name)
-        self.subtype = None
-        self.main_attribute = None
-        self.ap_cost = 0
-        self.damage_dice = ''
-        self.damage_type = ''
-        self.damage_dice2 = None
-        self.damage_type2 = None
-        self.slots = 0
-        self.str_req = 0
-        self.crit = {'Target Num': 20, 'Multiplier': None, 'Bonus_Damage': None, 'Effect': None}
-        self.range = 0
-        self.decay = 0
-        self.is_equipped = False
-
-    def __repr__(self):
-        return super().__repr__()
+def extract_crit_info(crit):
+    # 'Critical Hit' column is in format '<target_num>, <bonus_dice/multiplier>. <effect>'
+    # bonus_dice, multiplier, and effect are all optional. bonus_dice and multiplier cannot coexist.
+    target_num, bonus_dice, multiplier, effect = None, None, None, None
+    match = re.findall(r'(\d+)[\., ]+(\d?[dx]\d+)?[\., ]*(.*)[\.,]?', crit)
+    match = match[0]  # re.findall() returns [(x, y, z)] and I'd prefer (x, y, z), so this grabs the inner tuple
+    target_num = int(match[0])
+    if 'd' in match[1]:
+        bonus_dice = str(match[1])
+    elif 'x' in match[1]:
+        multiplier = int(match[1][1])
+    # a few of the bonus_dice are '+x' and this ends up in the effect match, so I'm putting it in the right place
+    # it also (thankfully) never coexists with effect text, so no string slicing required
+    # and yes, I tried getting RegEx to find it, but I only have so much time in the day and this fix worked, so...
+    if '+' in match[2]:
+        bonus_dice = str(match[2]).replace('.', '')  # removing pesky periods
+    elif match[2] != '':
+        effect = str(match[2]).replace('.', '')  # removing pesky periods
+    return target_num, multiplier, bonus_dice, effect
 
 
-class MeleeWeapon(Weapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.type = 'Melee Weapon'
-        self.main_attribute = 'Strength'
-        self.slots = 1
+weapons = pd.read_csv('csv/weapons.csv')
+weapons[['Crit Target Num', 'Crit Bonus Dice', 'Crit Multiplier', 'Crit Effect']] = None
+# populating the new columns with their appropriate values (keeping the None entries for exist checks later)
+for i in range(len(weapons)):
+    crit_tuple = extract_crit_info(weapons.loc[i, 'Critical Hit'])
+    weapons.loc[i, 'Crit Target Num'] = crit_tuple[0]
+    weapons.loc[i, 'Crit Bonus Dice'] = crit_tuple[1]
+    weapons.loc[i, 'Crit Multiplier'] = crit_tuple[2]
+    weapons.loc[i, 'Crit Effect'] = crit_tuple[3]
 
-    def __repr__(self):
-        return super().__repr__()
-
-
-class BladedWeapon(MeleeWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Bladed Weapon'
-
-    def __repr__(self):
-        return super().__repr__()
+weapons[['Crit Target Num', 'Crit Bonus Dice', 'Crit Multiplier', 'Crit Effect']]
 
 
-class BluntWeapon(MeleeWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Blunt Weapon'
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class MechanicalWeapon(MeleeWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Mechanical Weapon'
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class UnarmedWeapon(MeleeWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Unarmed'
-        self.main_attribute = ['Strength', 'Agility']
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class RangedWeapon(Weapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.type = 'Ranged Weapon'
-        self.main_attribute = 'Agility'
-        self.ammo = {'Type': None, 'Mag Size': None, 'Current Mag': None, 'Times Reloaded': None}
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class Handgun(RangedWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Handgun'
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class SubmachineGun(RangedWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Submachine Gun'
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class Rifle(RangedWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Rifle'
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class Shotgun(RangedWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Shotgun'
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class BigGun(RangedWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Big Gun'
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class EnergyWeapon(RangedWeapon):
-    def __init__(self, name):
-        super().__init__(name)
-        self.subtype = 'Energy Weapon'
-        self.main_attribute = 'Perception'
-
-    def __repr__(self):
-        return super().__repr__()
-
-
-class Gear(Item):
-    def __init__(self, name):
-        super().__init__(name)
-        self.type = 'Gear'
-
-    def __repr__(self):
-        return super().__repr__()
