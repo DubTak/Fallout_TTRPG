@@ -218,8 +218,8 @@ class Character:
         self.recalculate()
         # figure out a way to remove race
 
-    def add_to_inventory(self, item_name, item):
+    def add_to_inventory(self, item_name, item, qty):
         if item_name in self.inventory:
-            self.inventory[item_name][0] += 1
+            self.inventory[item_name][0] += qty
         else:
-            self.inventory[item_name] = [1, item]
+            self.inventory[item_name] = [qty, item]

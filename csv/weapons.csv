@@ -54,7 +54,7 @@ ID,Type,Sub Type,Name,Base Cost,Load,Properties,Slots,STR Req,AP,Damage Dice,Dam
 59,Melee Weapon,Unarmed Weapon,Deathclaw Gauntlet,280,6,"Unarmed, Debilitating, Mangle, Defensive.",1,5,6,3d12,slashing,,,,,"20, 1d12.",,
 60,Melee Weapon,Unarmed Weapon,Hunting Trap Fist,265,20,"Unarmed, Clasp, Debilitating, Defensive, Mangle.",1,8,5,4d4,piercing,,,,,"20, x2.",,
 61,Melee Weapon,Unarmed Weapon,Bear Trap Fist,320,40,"Unarmed, Clasp, Debilitating, Defensive, Mangle.",1,10,6,3d12,piercing,,,,,"20, x2.",,
-62,Melee Weapon,Unarmed Weapon,Power Fist,350,10,"Unarmed, Debilitating, Weighted. Ammo, 20 round magazine. Depleted: 1d6 bludgeoning.",1,6,4,4d6,piercing,,,,,"20, x2. Prone or 15 ft Knockback.",,
+62,Melee Weapon,Unarmed Weapon,Power Fist,350,10,"Unarmed, Debilitating, Weighted. Ammo (20 round mag), Depleted: 1d6 bludgeoning.",1,6,4,4d6,piercing,,,,,"20, x2. Prone or 15 ft Knockback.",,
 63,Ranged Weapon,Handgun,Flare Gun,90,2,Incendiary.,6,1,4,1d4,fire,,,,,"20, 1d4.",x4/x10,"Flare, 1 round."
 64,Ranged Weapon,Handgun,Acid Soaker,45,4,Corrosive.,6,1,4,1d1,acid,,,,,"20, 1d4.",30 ft,"Acid, 20 rounds."
 65,Ranged Weapon,Handgun,Pipe Pistol,165,8,"Breakable, Kickback, Semi-Automatic.",6,3,5,1d4,ballistic,,,,,"20, 1d4.",x6/x10,"9mm, 12 rounds."
@@ -81,8 +81,7 @@ ID,Type,Sub Type,Name,Base Cost,Load,Properties,Slots,STR Req,AP,Damage Dice,Dam
 86,Ranged Weapon,Rifle,Railway Rifle,730,18,"Debilitating, Destructive, Two-Handed.",6,6,6,2d10,piercing,,,,,"19, x4.",x4/x8,"Spike, 10 rounds."
 87,Ranged Weapon,Rifle,Junk Jet,300,18,"Breakable, Powerful, Unstable, Two-Handed.",6,6,6,3d6,b/p,,,,,"19, 3d6.",x4/x10,"Any item smaller than 1 ft cubed, 5 rounds."
 88,Ranged Weapon,Rifle,Sniper Rifle,710,16,"Accurate, Two-Handed.",6,5,6,2d12,ballistic,,,,,"19, x4.",x10/x30,".308, 6 rounds."
-89,Ranged Weapon,Rifle,Assault Rifle,375,14,"Automatic: 3 (Switch), Two-Handed. Single Shot: Accurate, Semi-Automatic.
-Automatic: Unstable.",6,5,6,1d10,ballistic,,,,,"20, 1d10.",x8/x18,"5.56, 24 rounds."
+89,Ranged Weapon,Rifle,Assault Rifle,375,14,"Automatic: 3 (Switch), Two-Handed, Single Shot: Accurate, Semi-Automatic, Unstable (Automatic).",6,5,6,1d10,ballistic,,,,,"20, 1d10.",x8/x18,"5.56, 24 rounds."
 90,Ranged Weapon,Rifle,Anti-Materiel Rifle,1200,20,"Accurate, Two-Handed.",6,7,6,5d8,ballistic,,,,,"19, x4.",x16/x40,".50, 6 rounds."
 91,Ranged Weapon,Shotgun,Lever-Action Shotgun,600,10,"Powerful, Manual Reload, Spread, Two-Handed.",6,5,4,3d4,ballistic,,,,,"20, 5d4.",x3/x6,"20 gauge, 5 rounds."
 92,Ranged Weapon,Shotgun,Single Shotgun,500,10,"Powerful, Quick Reload, Spread, Two-Handed.",6,4,4,3d6,ballistic,,,,,"20, 3d6.",x3/x6,"20 gauge, 1 round."

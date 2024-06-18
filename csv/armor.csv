@@ -1,0 +1,7 @@
+ID,Type,Name,Base Cost,Load,Slots,STR Req,AC,DT
+1,Armor,Cloth,50,5,8,1,10,0
+2,Armor,Leather,175,15,6,1,11,1
+3,Armor,Metal,250,20,4,5,12,0
+4,Armor,Multi-layered,275,40,5,3,10,2
+5,Armor,Ballistic_Weave,800,10,2,3,12,3
+6,Armor,Steel,650,50,2,6,13,2

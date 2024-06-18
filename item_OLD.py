@@ -1,7 +1,10 @@
+from item import WEAPONS, ARMOR  # , AMMO, CONSUMABLES, GEAR
+
+
 class Item:
     def __init__(self, name):
         self.name = name
-        self.id =0
+        self.id = 0
         self.load = 0
         self.base_cost = 0
         self.type = None
@@ -16,16 +19,23 @@ class Item:
 class Armor(Item):
     def __init__(self, name):
         super().__init__(name)
-        self.type = "Armor"
-        self.ac = 10
-        self.dt = 0
-        self.slots = 0
-        self.str_req = 0
+        self.type = 'Armor'
+        if ARMOR['Name'].isin([self.name]).any():
+            entry = ARMOR[ARMOR.Name == self.name]
+            self.ac = entry.AC.values[0]
+            self.dt = entry.DT.values[0]
+            self.slots = entry.Slots.values[0]
+            self.str_req = entry['STR Req'].values[0]
+        else:
+            self.ac = 10
+            self.dt = 0
+            self.slots = 0
+            self.str_req = 0
+
         self.decay = 0
         self.is_equipped = False
+print(Armor('Cloth').slots)
 
-    def __repr__(self):
-        return super().__repr__()
 
 
 class Weapon(Item):
@@ -47,9 +57,6 @@ class Weapon(Item):
         self.decay = 0
         self.is_equipped = False
 
-    def __repr__(self):
-        return super().__repr__()
-
 
 class MeleeWeapon(Weapon):
     def __init__(self, name):
@@ -58,17 +65,11 @@ class MeleeWeapon(Weapon):
         self.main_attribute = 'Strength'
         self.slots = 1
 
-    def __repr__(self):
-        return super().__repr__()
-
 
 class BladedWeapon(MeleeWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Bladed Weapon'
-
-    def __repr__(self):
-        return super().__repr__()
 
 
 class BluntWeapon(MeleeWeapon):
@@ -76,17 +77,11 @@ class BluntWeapon(MeleeWeapon):
         super().__init__(name)
         self.subtype = 'Blunt Weapon'
 
-    def __repr__(self):
-        return super().__repr__()
-
 
 class MechanicalWeapon(MeleeWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Mechanical Weapon'
-
-    def __repr__(self):
-        return super().__repr__()
 
 
 class UnarmedWeapon(MeleeWeapon):
@@ -94,9 +89,6 @@ class UnarmedWeapon(MeleeWeapon):
         super().__init__(name)
         self.subtype = 'Unarmed'
         self.main_attribute = ['Strength', 'Agility']
-
-    def __repr__(self):
-        return super().__repr__()
 
 
 class RangedWeapon(Weapon):
@@ -106,17 +98,11 @@ class RangedWeapon(Weapon):
         self.main_attribute = 'Agility'
         self.ammo = {'Type': None, 'Mag Size': None, 'Current Mag': None, 'Times Reloaded': None}
 
-    def __repr__(self):
-        return super().__repr__()
-
 
 class Handgun(RangedWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Handgun'
-
-    def __repr__(self):
-        return super().__repr__()
 
 
 class SubmachineGun(RangedWeapon):
@@ -124,17 +110,11 @@ class SubmachineGun(RangedWeapon):
         super().__init__(name)
         self.subtype = 'Submachine Gun'
 
-    def __repr__(self):
-        return super().__repr__()
-
 
 class Rifle(RangedWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Rifle'
-
-    def __repr__(self):
-        return super().__repr__()
 
 
 class Shotgun(RangedWeapon):
@@ -142,17 +122,11 @@ class Shotgun(RangedWeapon):
         super().__init__(name)
         self.subtype = 'Shotgun'
 
-    def __repr__(self):
-        return super().__repr__()
-
 
 class BigGun(RangedWeapon):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Big Gun'
-
-    def __repr__(self):
-        return super().__repr__()
 
 
 class EnergyWeapon(RangedWeapon):
@@ -161,14 +135,48 @@ class EnergyWeapon(RangedWeapon):
         self.subtype = 'Energy Weapon'
         self.main_attribute = 'Perception'
 
-    def __repr__(self):
-        return super().__repr__()
-
 
 class Gear(Item):
     def __init__(self, name):
         super().__init__(name)
         self.type = 'Gear'
 
-    def __repr__(self):
-        return super().__repr__()
+
+class Bag(Gear):
+    def __init__(self, name):
+        super().__init__(name)
+        self.subtype = 'Bag'
+
+
+class Ammo(Item):
+    def __init__(self, name, special=False):
+        super().__init__(name)
+        if special:
+            pass  # I, obviously, need to make the AMMO DataFrame for this to work
+            # entry = AMMO.loc[AMMO['name'] == name]
+            # self.name = name + ' ' + entry['Sub Type]'
+        self.type = 'Ammo'
+
+
+class Consumable(Item):
+    def __init__(self, name):
+        super().__init__(name)
+        self.type = 'Consumable'
+
+
+class Healing(Consumable):
+    def __init__(self, name):
+        super().__init__(name)
+        self.subtype = 'Healing'
+
+
+class Food(Consumable):
+    def __init__(self, name):
+        super().__init__(name)
+        self.subtype = 'Food'
+
+
+class Drink(Consumable):
+    def __init__(self, name):
+        super().__init__(name)
+        self.subtype = 'Drink'

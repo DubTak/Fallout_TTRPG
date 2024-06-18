@@ -2,6 +2,7 @@ import pandas as pd
 import re
 
 
+# WEAPONS
 def extract_crit_info(crit):
     # 'Critical Hit' column is in format '<target_num>, <bonus_dice/multiplier>. <effect>'
     # bonus_dice, multiplier, and effect are all optional. bonus_dice and multiplier cannot coexist.
@@ -23,6 +24,13 @@ def extract_crit_info(crit):
     return target_num, multiplier, bonus_dice, effect
 
 
+def properties_to_list(properties):
+    properties_list = []
+    for property in properties.rstrip('.').split(', '):
+        properties_list.append(property)
+    return properties_list
+
+
 def extract_range(range, thrown=False):
     range_short, range_long = None, None
     if thrown:
@@ -40,32 +48,37 @@ def extract_range(range, thrown=False):
     return range_short, range_long
 
 
-weapons = pd.read_csv('csv/weapons.csv')
+WEAPONS = pd.read_csv('csv/weapons.csv')
 
-weapons[['Crit Target Num', 'Crit Bonus Dice', 'Crit Multiplier', 'Crit Effect']] = None
+WEAPONS[['Crit Target Num', 'Crit Bonus Dice', 'Crit Multiplier', 'Crit Effect']] = None
 # populating the new crit columns with their appropriate values (keeping the None entries for exist checks later)
-for i in range(len(weapons)):
-    crit_tuple = extract_crit_info(weapons.loc[i, 'Critical Hit'])
-    weapons.loc[i, 'Crit Target Num'] = crit_tuple[0]
-    weapons.loc[i, 'Crit Bonus Dice'] = crit_tuple[1]
-    weapons.loc[i, 'Crit Multiplier'] = crit_tuple[2]
-    weapons.loc[i, 'Crit Effect'] = crit_tuple[3]
+for i in range(len(WEAPONS)):
+    crit_tuple = extract_crit_info(WEAPONS.loc[i, 'Critical Hit'])
+    WEAPONS.loc[i, 'Crit Target Num'] = crit_tuple[0]
+    WEAPONS.loc[i, 'Crit Bonus Dice'] = crit_tuple[1]
+    WEAPONS.loc[i, 'Crit Multiplier'] = crit_tuple[2]
+    WEAPONS.loc[i, 'Crit Effect'] = crit_tuple[3]
 
-weapons[['Range Short', 'Range Long']] = None
+WEAPONS[['Range Short', 'Range Long']] = None
 # populating the new range columns as above
-for i in range(len(weapons)):
-    range_tuple = extract_range(weapons.loc[i, 'Range'])
-    if len(range_tuple) == 0:
-        weapons.loc[i, 'Range Short'] = weapons.loc[i, 'Range']
+for i in range(len(WEAPONS)):
+    range_tuple = extract_range(WEAPONS.loc[i, 'Range'])
+    if range_tuple[1] is not None:
+        WEAPONS.loc[i, 'Range Short'] = range_tuple[0]
+        WEAPONS.loc[i, 'Range Long'] = range_tuple[1]
     else:
-        weapons.loc[i, 'Range Short'] = range_tuple[0]
-        weapons.loc[i, 'Range Long'] = range_tuple[1]
-for i in range(len(weapons)):
-    if 'Thrown' in weapons.loc[i, 'Properties']:
-        range_tuple = extract_range(weapons.loc[i, 'Properties'], thrown=True)
-        weapons.loc[i, 'Range Short'] = range_tuple[0]
-        weapons.loc[i, 'Range Long'] = range_tuple[1]
+        WEAPONS.loc[i, 'Range Short'] = WEAPONS.loc[i, 'Range']
+for i in range(len(WEAPONS)):
+    if 'Thrown' in WEAPONS.loc[i, 'Properties']:
+        range_tuple = extract_range(WEAPONS.loc[i, 'Properties'], thrown=True)
+        WEAPONS.loc[i, 'Range Short'] = range_tuple[0]
+        WEAPONS.loc[i, 'Range Long'] = range_tuple[1]
 
-ranger = weapons[['Range Short', 'Range Long']]
-ranger
+WEAPONS['Properties'] = WEAPONS['Properties'].apply(properties_to_list)
+
+
+# ARMOR
+ARMOR = pd.read_csv('csv/armor.csv')
+
+
 
