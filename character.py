@@ -7,8 +7,10 @@ from race import (
     buzz_saw, clippers, robo_drill, gripper, robo_torch
     # add robots and super mutants once implemented
 )  # make a main.py and move this over to it
+from background import cultist
 import random
-
+from copy import deepcopy
+from warnings import warn
 
 
 class Attribute:
@@ -209,6 +211,7 @@ class Character:
 
     def apply_race(self, race):
         self.race = race
+
         for k, v in race.traits.items():
             if k == 'Age':  # need to figure out where to put the age desc
                 continue
@@ -217,6 +220,7 @@ class Character:
             else:
                 if v[0] != 'UNIMPLEMENTED':
                     exec(v[0])
+
         if race.extra_traits != {}:
             key_list = [key for key in race.extra_traits.keys()]
             choice = random.choice(key_list)  # VERY TEMPORARY FIX: IMPLEMENT CHOOSING ASAP
@@ -227,6 +231,59 @@ class Character:
 
     def add_to_inventory(self, item, qty):
         if item.name in self.inventory:
-            self.inventory[item.name][1] += qty
+            if item == self.inventory[item.name]:
+                self.inventory[item.name][1] += qty
+            else:
+                item_suffix = 1
+                name_available = False
+                while not name_available:
+                    if item.name.endswith(f'({item_suffix})'):
+                        item_suffix += 1
+                    else:
+                        self.inventory[f'{item.name}({item_suffix})'] = [item, qty]
+                        name_available = True
         else:
             self.inventory[item.name] = [item, qty]
+
+    def apply_upgrade_to_item(self, item_name, upgrade):
+        if item_name in self.inventory:
+            if self.inventory[item_name][1] > 1:
+                self.inventory[item_name][1] -= 1
+                new_item = deepcopy(self.inventory[item_name][0])
+# I'm trying to pop out one instance of the item, add ' (upgraded)' if it doesn't have it, apply upgrades
+    # AKA [properties], add upgraded item to inv, and delete the old entry if qty == 0
+
+
+    def apply_trait(self, trait, wild_wasteland=False):
+        pass
+
+    def apply_background(self, background, wild_trait=False):
+        self.background = deepcopy(background)
+
+        for bg_skill in self.background.skills:
+            for skill in self.skills:
+                if bg_skill == skill.name:
+                    skill.ranks += 2
+
+        if wild_trait:
+            self.apply_trait(self.background.trait, wild_wasteland=True)
+        else:
+            self.apply_trait(self.background.trait)
+
+        self.background.choose_starting_gear(self.race.name)
+        for item in self.background.starting_gear:
+            if isinstance(item, str):
+                exec(item)
+            else:
+                self.add_to_inventory(item[0], item[1])
+                if len(item) == 3:
+                    item_properties = item[2]
+                    if item_properties[0] == 'UPGRADES':
+                        item_properties = item_properties[1:]
+                        for property in item_properties:
+                            item[0].slots_current -= 1
+                            self.inventory[item[0].name][0].properties.append(property)
+                    else:
+                        self.inventory[item[0].name][0].properties.extend(item_properties)
+
+

@@ -8,12 +8,15 @@ class Item:
         self.load = 0
         self.base_cost = 0
         self.type = None
-        self.properties = None
+        self.properties = []
         self.description = None
 
     # I should probably make this the __str__() and make __repr__() more descriptive, but that's a tomorrow problem
     def __repr__(self):
         return f'{self.__class__.__name__}(\'{self.name}\')'
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 
 class Armor(Item):
@@ -22,16 +25,17 @@ class Armor(Item):
         self.type = 'Armor'
         if ARMOR['Name'].isin([self.name]).any():
             entry = ARMOR[ARMOR.Name == self.name]
-            self.ac = entry.AC.values[0]
-            self.dt = entry.DT.values[0]
-            self.slots = entry.Slots.values[0]
+            self.ac = entry['AC'].values[0]
+            self.dt = entry['DT'].values[0]
+            self.slots_max = entry['Slots'].values[0]
             self.str_req = entry['STR Req'].values[0]
         else:
             self.ac = 10
             self.dt = 0
-            self.slots = 0
+            self.slots_max = 0
             self.str_req = 0
 
+        self.slots_current = self.slots_max
         self.decay = 0
         self.is_equipped = False
 
