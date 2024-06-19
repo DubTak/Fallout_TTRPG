@@ -34,8 +34,6 @@ class Armor(Item):
 
         self.decay = 0
         self.is_equipped = False
-print(Armor('Cloth').slots)
-
 
 
 class Weapon(Item):
@@ -180,3 +178,15 @@ class Drink(Consumable):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Drink'
+
+
+class Chem(Consumable):
+    def __init__(self, name):
+        super().__init__(name)
+        self.subtype = 'Chem'
+
+
+class Overclock(Consumable):
+    def __init__(self, name):
+        super().__init__(name)
+        self.subtype = 'Overclock Program'

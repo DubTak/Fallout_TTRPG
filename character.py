@@ -17,12 +17,14 @@ class Attribute:
         self.abbreviation = abbreviation
         self.score = score
         self.modifier = 5 - self.score
+        self.max = 10
 
     def __repr__(self):
         return f'self.name'
 
     def calc_modifier(self):
         self.modifier = self.score - 5
+
 
 class Skill:
     def __init__(self, name, attribute):
@@ -57,37 +59,37 @@ class Character:
         self.condition_immunities = set()
 
         # Inventory
-        self.inventory = {}  # format is item_name: [qty, item_class_instance]
+        self.inventory = {}  # format is item_name: [item_class_instance, quantity]
         self.caps = 0
         self.ac = 10
         self.dt = 0
 
 
         # Attributes
-        self.S = Attribute('Strength', 'STR', 5)
-        self.P = Attribute('Perception', 'PER', 5)
-        self.E = Attribute('Endurance', 'END', 5)
-        self.C = Attribute('Charisma', 'CHA', 5)
-        self.I = Attribute('Intelligence', 'INT', 5)
-        self.A = Attribute('Agility', 'AGI', 5)
-        self.L = Attribute('Luck', 'LCK', 5)
+        self.strength = Attribute('Strength', 'STR', 5)
+        self.perception = Attribute('Perception', 'PER', 5)
+        self.endurance = Attribute('Endurance', 'END', 5)
+        self.charisma = Attribute('Charisma', 'CHA', 5)
+        self.intelligence = Attribute('Intelligence', 'INT', 5)
+        self.agility = Attribute('Agility', 'AGI', 5)
+        self.luck = Attribute('Luck', 'LCK', 5)
         self.unspent_attributes = 3
-        self.attributes = [self.S, self.P, self.E, self.C, self.I, self.A, self.L]
+        self.attributes = [self.strength, self.perception, self.endurance, self.charisma, self.intelligence, self.agility, self.luck]
 
         # Skills
-        self.barter = Skill('Barter', self.C)
-        self.breach = Skill('Breach', [self.P, self.I])
-        self.crafting = Skill('Crafting', self.I)
-        self.energy_weapons = Skill('Energy Weapons', self.P)
-        self.explosives = Skill('Explosives', self.P)
-        self.guns = Skill('Guns', self.A)
-        self.intimidation = Skill('Intimidation', [self.S, self.C])
-        self.medicine = Skill('Medicine', [self.P, self.I])
-        self.melee_weapons = Skill('Melee Weapons', self.S)
-        self.science = Skill('Science', self.I)
-        self.sneak = Skill('Sneak', self.A)
-        self.speech = Skill('Speech', self.C)
-        self.unarmed = Skill('Unarmed', [self.S, self.A])
+        self.barter = Skill('Barter', self.charisma)
+        self.breach = Skill('Breach', [self.perception, self.intelligence])
+        self.crafting = Skill('Crafting', self.intelligence)
+        self.energy_weapons = Skill('Energy Weapons', self.perception)
+        self.explosives = Skill('Explosives', self.perception)
+        self.guns = Skill('Guns', self.agility)
+        self.intimidation = Skill('Intimidation', [self.strength, self.charisma])
+        self.medicine = Skill('Medicine', [self.perception, self.intelligence])
+        self.melee_weapons = Skill('Melee Weapons', self.strength)
+        self.science = Skill('Science', self.intelligence)
+        self.sneak = Skill('Sneak', self.agility)
+        self.speech = Skill('Speech', self.charisma)
+        self.unarmed = Skill('Unarmed', [self.strength, self.agility])
         self.skills_per_levelup = 0
         self.skills_per_levelup_misc_bonus = 0
         self.unspent_skills = 0
@@ -104,22 +106,24 @@ class Character:
 
         # Derived Stats
         self.luck_bonus = 0
-        self.sp_max = self.A.modifier + 10
+        self.sp_max = self.agility.modifier + 10
         self.sp_current = self.sp_max
-        self.hp_max = self.E.modifier + 10
+        self.hp_max = self.endurance.modifier + 10
         self.hp_current = self.hp_max
-        self.ap_max = self.A.modifier + 10
+        self.ap_max = self.agility.modifier + 10
         self.ap_limit = 15
         self.ap_current = self.ap_max
-        self.healing_rate = (self.level + self.E.modifier) // 2
-        self.carry_load = self.S.score * 10
-        self.passive_sense = self.P.modifier + 12
+        self.healing_rate = (self.level + self.endurance.modifier) // 2
+        self.carry_load = self.strength.score * 10
+        self.passive_sense = self.perception.modifier + 12
         self.party_nerve = 0  # derived elsewhere
         self.group_sneak = 0  # derived elsewhere
-        self.death_save_mod = max([self.E.modifier, self.L.modifier]) + self.party_nerve
+        self.death_save_mod = max([self.endurance.modifier, self.luck.modifier]) + self.party_nerve
         self.death_saves = {'Success': 0, 'Failure': 0}
-        self.targeted_attack_rerolls = max([self.L.modifier, 0])
+        self.targeted_attack_rerolls = max([self.luck.modifier, 0])
         self.targeted_attack_rerolls_current = self.targeted_attack_rerolls
+        # chem limit is minimum 1, maximum 4
+        self.chem_limit = min([4, max([1, (self.endurance.modifier // 2) + 2])])
 
         # Penalties and Radiation DC
         self.total_penalty = 0
@@ -128,17 +132,17 @@ class Character:
         self.exhaustion = 0
         self.fatigue = 0
         self.rad_level = 0
-        self.radiation_dc = 12 - self.E.modifier
+        self.radiation_dc = 12 - self.endurance.modifier
         self.irradiated_food = 0
         self.rad_damage = 0
 
         self.recalculate()
 
     def calc_luck_bonus(self):
-        if self.L.modifier < 0:
+        if self.luck.modifier < 0:
             self.luck_bonus = -1
-        elif self.L.modifier >= 0:
-            self.luck_bonus = self.L.modifier // 2
+        elif self.luck.modifier >= 0:
+            self.luck_bonus = self.luck.modifier // 2
 
     def calc_total_penalty(self):
         self.total_penalty = 0 - self.exhaustion - self.fatigue
@@ -163,35 +167,38 @@ class Character:
         self.calc_total_penalty()
         for attribute in self.attributes:
             attribute.calc_modifier()
+
         self.calc_luck_bonus()
+
         for skill in self.skills:
             self.calc_skill_total(skill)
-        if self.I.modifier > 0:
+
+        if self.intelligence.modifier > 0:
             self.skills_per_levelup = 5 + self.skills_per_levelup_misc_bonus
-        elif self.I.modifier < 0:
+        elif self.intelligence.modifier < 0:
             self.skills_per_levelup = 3 + self.skills_per_levelup_misc_bonus
         else:
             self.skills_per_levelup = 4 + self.skills_per_levelup_misc_bonus
 
-        self.sp_max = self.A.modifier + 10 + (5 + self.A.modifier) * ((self.level - 1) // 2)
-        self.hp_max = (self.E.modifier + 10 + (5 + self.E.modifier) * ((self.level - 1) // 2)) - self.rad_damage
-        self.ap_max = self.A.modifier + 10
-        if self.ap_max > self.ap_limit:
-            self.ap_max = self.ap_limit
-        self.healing_rate = (self.level + self.E.modifier) // 2
-        self.carry_load = self.S.score * 10
-        self.passive_sense = self.P.modifier + 12
-        self.death_save_mod = max([self.E.modifier, self.L.modifier]) + self.party_nerve
-        self.targeted_attack_rerolls = max([self.L.modifier, 0])
+        self.sp_max = self.agility.modifier + 10 + (5 + self.agility.modifier) * ((self.level - 1) // 2)
+        self.hp_max = (self.endurance.modifier + 10 + (5 + self.endurance.modifier) * ((self.level - 1) // 2)) - self.rad_damage
+        # Max AP is USUALLY 15, and this check is to make sure we're at or under Max
+        self.ap_max = min([self.agility.modifier + 10, self.ap_limit])
+        self.healing_rate = (self.level + self.endurance.modifier) // 2
+        self.carry_load = self.strength.score * 10
+        self.passive_sense = self.perception.modifier + 12
+        self.death_save_mod = max([self.endurance.modifier, self.luck.modifier]) + self.party_nerve
+        self.targeted_attack_rerolls = max([self.luck.modifier, 0])
         if self.radiation_dc is not None:
-            self.radiation_dc = 12 - self.E.modifier
+            self.radiation_dc = 12 - self.endurance.modifier
+        self.chem_limit = min([4, max([1, (self.endurance.modifier // 2) + 2])])
 
     def adjust_attribute(self, attribute, change):
         attribute.score += change
-        if self.L.score >= 10 and not self.luck_10_karma:
+        if self.luck.score >= 10 and not self.luck_10_karma:
             self.karma_caps += 1
             self.luck_10_karma = True
-        elif self.L.score < 10 and self.luck_10_karma:
+        elif self.luck.score < 10 and self.luck_10_karma:
             self.karma_caps -= 1
             self.luck_10_karma = False
         self.recalculate()
@@ -218,8 +225,8 @@ class Character:
         self.recalculate()
         # figure out a way to remove race
 
-    def add_to_inventory(self, item_name, item, qty):
-        if item_name in self.inventory:
-            self.inventory[item_name][0] += qty
+    def add_to_inventory(self, item, qty):
+        if item.name in self.inventory:
+            self.inventory[item.name][1] += qty
         else:
-            self.inventory[item_name] = [qty, item]
+            self.inventory[item.name] = [item, qty]
