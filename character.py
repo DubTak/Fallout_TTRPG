@@ -110,8 +110,10 @@ class Character:
         self.luck_bonus = 0
         self.sp_max = self.agility.modifier + 10
         self.sp_current = self.sp_max
+        self.sp_misc_bonus = 0
         self.hp_max = self.endurance.modifier + 10
         self.hp_current = self.hp_max
+        self.hp_misc_bonus = 0
         self.ap_max = self.agility.modifier + 10
         self.ap_limit = 15
         self.ap_current = self.ap_max
@@ -253,9 +255,23 @@ class Character:
 # I'm trying to pop out one instance of the item, add ' (upgraded)' if it doesn't have it, apply upgrades
     # AKA [properties], add upgraded item to inv, and delete the old entry if qty == 0
 
+    def apply_trait(self, trait, wild_wasteland=None):
+        if not trait.check_requirements(self):
+            warn('Trait requirements not met')
+        else:
+            if wild_wasteland is not None:  # might wanna retool this so we don't have the ww check in 2 places
+                trait.wild_wasteland = wild_wasteland
+            trait.apply_wild_wasteland()
+            exec(trait.effect)
+            self.traits.append(trait)
+            self.recalculate()
 
-    def apply_trait(self, trait, wild_wasteland=False):
-        pass
+    def apply_perk(self, perk):
+        if not perk.check_requirements(self):
+            warn('Perk requirements not met')
+        else:
+            exec(perk.effect)
+            self.perks.append(perk)
 
     def apply_background(self, background, wild_trait=False):
         self.background = deepcopy(background)
@@ -285,5 +301,3 @@ class Character:
                             self.inventory[item[0].name][0].properties.append(property)
                     else:
                         self.inventory[item[0].name][0].properties.extend(item_properties)
-
-
