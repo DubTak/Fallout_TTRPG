@@ -8,6 +8,7 @@ class Item:
         self.load = 0
         self.base_cost = 0
         self.type = None
+        self.subtype = None
         self.properties = []
         self.description = None
 
@@ -45,7 +46,6 @@ class Weapon(Item):
         # , name, id=0, type=None, subtype=None, load=0, base_cost=0, ap_cost=0, damage_dice='', damage_type='',
         #             damage_dice2=None, damage_type2=None, slots=0, str_req=0
         super().__init__(name)
-        self.subtype = None
         self.main_attribute = None
         self.ap_cost = 0
         self.damage_dice = ''
@@ -148,6 +148,7 @@ class Bag(Gear):
     def __init__(self, name):
         super().__init__(name)
         self.subtype = 'Bag'
+        self.load_bonus = 0
 
 
 class Ammo(Item):

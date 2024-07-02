@@ -65,6 +65,10 @@ class Character:
         self.caps = 0
         self.ac = 10
         self.dt = 0
+        self.equipped_armor = None
+        self.equipped_weapons = {}
+        self.equipped_misc = {}
+        self.bag_bonus_load = 0
 
 
         # Attributes
@@ -157,7 +161,6 @@ class Character:
         if self.rad_level is not None:
             self.total_penalty -= self.rad_level
 
-
     def calc_skill_total(self, skill):
         if isinstance(skill.attribute, list):
             skill.total_bonus = [
@@ -185,17 +188,31 @@ class Character:
             self.skills_per_levelup = 4 + self.skills_per_levelup_misc_bonus
 
         self.sp_max = self.agility.modifier + 10 + (5 + self.agility.modifier) * ((self.level - 1) // 2)
-        self.hp_max = (self.endurance.modifier + 10 + (5 + self.endurance.modifier) * ((self.level - 1) // 2)) - self.rad_damage
+        self.hp_max = (self.endurance.modifier + 10 + (5 + self.endurance.modifier) *
+                       ((self.level - 1) // 2)) - self.rad_damage
         # Max AP is USUALLY 15, and this check is to make sure we're at or under Max
         self.ap_max = min([self.agility.modifier + 10, self.ap_limit])
         self.healing_rate = (self.level + self.endurance.modifier) // 2
-        self.carry_load = self.strength.score * 10
+        self.carry_load = (self.strength.score * 10) + self.bag_bonus_load
         self.passive_sense = self.perception.modifier + 12
         self.death_save_mod = max([self.endurance.modifier, self.luck.modifier]) + self.party_nerve
         self.targeted_attack_rerolls = max([self.luck.modifier, 0])
         if self.radiation_dc is not None:
             self.radiation_dc = 12 - self.endurance.modifier
         self.chem_limit = min([4, max([1, (self.endurance.modifier // 2) + 2])])
+
+        if self.equipped_armor is not None:
+            self.ac = min([self.equipped_armor.ac - (self.equipped_armor.decay // 2), 10])
+            self.dt = min([self.equipped_armor.dt - (self.equipped_armor.decay // 2), 0])
+        else:
+            self.ac, self.dt = 10, 0
+        for weapon in self.equipped_weapons:
+            for skill in self.skills:
+                if self.equipped_weapons[weapon][0].type in skill.name:
+                    if isinstance(skill.total_bonus, list):
+                        self.equipped_weapons[weapon][1] = max(skill.total_bonus)
+                    else:
+                        self.equipped_weapons[weapon][1] = skill.total_bonus
 
     def adjust_attribute(self, attribute, change):
         attribute.score += change
@@ -246,6 +263,25 @@ class Character:
                         name_available = True
         else:
             self.inventory[item.name] = [item, qty]
+
+    def equip_item(self, item):
+        if 'Armor' in item.type:
+            if self.equipped_armor is not None:
+                self.equipped_armor.load *= 2  # equipped armor has half load (reversing that before return to inv)
+                self.add_to_inventory(self.equipped_armor, 1)
+            self.equipped_armor = item
+            self.equipped_armor.load /= 2  # equipped armor has half load
+        elif 'Weapon' in item.type:
+            for skill in self.skills:
+                if item.type in skill.name:  # using this syntax because some of the skill names are pluralized
+                    to_hit = skill.total_bonus
+                    self.equipped_weapons[item.name] = [item, to_hit]
+        else:
+            if item.subtype is not None and 'Bag' in item.subtype:
+                self.bag_bonus_load += item.load_bonus
+            self.equipped_misc[item.name] = [item]
+
+        self.recalculate()
 
     def apply_upgrade_to_item(self, item_name, upgrade):
         if item_name in self.inventory:
